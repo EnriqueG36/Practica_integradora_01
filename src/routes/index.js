@@ -6,7 +6,7 @@ const {Router} = require('express')
 
 const productRouter = require('./product.router.js');  	//en userRouter viene toda la configuración de nuestras rutas de products.
 const cartRouter = require('./cart.router.js');
-//const viewRouter = require('./routes/views.router.js');    
+const viewRouter = require('./views.router.js');    
 
 	
 const router = Router()
@@ -14,11 +14,11 @@ const router = Router()
 
 router.use('/api/products', productRouter)	                        //api es por convención
 router.use('/api/carts', cartRouter)
-//router.use('/', viewRouter)
+router.use('/', viewRouter)											//router de views no llevará api
 
 
 router.use('/', (req, res)=>{
-		res.send('Hola mundo s')
+		res.send('Hola mundo')
 })
 
 

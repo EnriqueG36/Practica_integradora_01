@@ -1,9 +1,20 @@
 //1er Practica integradora
 const express = require('express')
-const routerServer = require('./routes/index.js')	//este está mas adelante
+const handlebars = require('express-handlebars')                //Importamos el modulo handlebars
+const {Server} = require('socket.io')                           //Importamos el modulo socket.io
+
+const routerServer = require('./routes/index.js')	                    //este está mas adelante
 const objectConfig = require('./config/configServer.js')                //Importamos el objecto de configuración de mongoose a mongoAtlas
+const { websocketFuncion } = require('./utils/socketLogic.js')
 
 const app = express()
+
+//Configuración de handlebars:
+app.engine('handlebars', handlebars.engine())                   //Definir nuestro motor de plantillas
+app.set('views', __dirname+'/views')                            //Settea el directorio donde buscará las carpetas de plantillas
+app.set('view engine', 'handlebars')                            //indicamos a express que motor de plantillas se va a usar
+app.use(express.static(__dirname+'/public'))
+
 const PORT = 8080
 
 app.use(express.json())
@@ -14,7 +25,12 @@ objectConfig.connectDB()                                //Se ejecuta el metodo c
 
 app.use(routerServer)	                             //Esto es nuevo, es para quitar los routers de productos y carritos del archivo principal, se define en un archivo index dentro de /routes
 
-app.listen(PORT, (err) => {
+const httpServer = app.listen(PORT, (err) => {
 if(err) console.log('Error en el servidor', err)
 console.log(`Escuchando en el puerto: ${PORT}`)
 })
+
+const socketServer = new Server(httpServer)
+
+//Funcion que contiene los eventos emit y on de websockets
+websocketFuncion(socketServer)
